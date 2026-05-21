@@ -1,0 +1,6 @@
+{
+  "name": "Android Joylashuv",
+  "description": "Har 5 daqiqada aniq joylashuvni xaritada va ro'yxatda saqlab boruvchi ilova.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
