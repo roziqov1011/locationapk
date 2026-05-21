@@ -26,8 +26,15 @@ jobs:
     - name: Gradle-ga ruxsat berish
       run: chmod +x gradlew
 
-    - name: APK faylni yig'ish (Build)
-      run: ./gradlew assembleDebug --no-daemon
+    - name: Avtomatik vaqtinchalik Keystore yaratish
+      run: |
+        mkdir -p ~/.android
+        keytool -genkey -v -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
+        # Agar loyiha ichida maxsus joydan qidirayotgan bo'lsa, o'sha yerga ham nusxalaymiz
+        cp ~/.android/debug.keystore ./debug.keystore || true
+
+    - name: APK faylni yig'ish (Signing xatoliklarini chetlab o'tish)
+      run: ./gradlew assembleDebug -Pandroid.injected.signing.store.file=~/.android/debug.keystore -Pandroid.injected.signing.store.password=android -Pandroid.injected.signing.key.alias=androiddebugkey -Pandroid.injected.signing.key.password=android --no-daemon
 
     - name: Tayyor APK-ni yuklab olish uchun saqlash
       uses: actions/upload-artifact@v4
