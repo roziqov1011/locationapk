@@ -28,19 +28,16 @@ jobs:
 
     - name: Gradle aynan so'rayotgan manzilga debug.keystore yaratish
       run: |
-        # 1. Avval tizimda standart debug kalit yaratamiz
-        mkdir -p ~/.android
-        keytool -genkey -v -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
-        
-        # 2. Gradle xatolikda so'ragan o'sha g'alati ichki papkani majburlab ochamiz
         mkdir -p /home/runner/.gradle/daemon/9.5.1/~/.android/
-        
-        # 3. Kalitni aynan o'sha u qidirgan manzilga nusxalaymiz
-        cp ~/.android/debug.keystore /home/runner/.gradle/daemon/9.5.1/~/.android/debug.keystore
-        
-        # 4. Loyihaning asosiy ildiz (root) papkasiga ham nusxalab qo'yamiz (har ehtimolga qarshi)
-        cp ~/.android/debug.keystore ./debug.keystore
-        cp ~/.android/debug.keystore ./locationapk/debug.keystore || true
+        keytool -genkey -v -keystore /home/runner/.gradle/daemon/9.5.1/~/.android/debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
+        cp /home/runner/.gradle/daemon/9.5.1/~/.android/debug.keystore ./debug.keystore
 
-    - name: APK faylni yig'ish (Build)
-      run: ./gradlew assembleDebug --no-daemon
+    - name: APK faylni yig'ish (Keshni tozalash bilan)
+      run: ./gradlew clean assembleDebug --no-daemon --no-build-cache
+
+    - name: Tayyor APK-ni yuklab olish uchun saqlash
+      uses: actions/upload-artifact@v4
+      with:
+        name: Ilova-Debug-APK
+        path: app/build/outputs/apk/debug/app-debug.apk
+        if-no-files-found: error
