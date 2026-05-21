@@ -20,13 +20,19 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
 
-    - name: Gradle-ga ruxsatlarni to'g'rilash
+    - name: Gradlew faylini qidirish va ruxsat berish
       run: |
-        if [ -f gradlew ]; then
-          chmod +x gradlew
-        else
-          echo "gradlew fayli topilmadi!"
+        GRADLEW_PATH=$(find . -name "gradlew" -print -quit)
+        if [ -z "$GRADLEW_PATH" ]; then
+          echo "XATOLIK: Loyihada gradlew fayli umuman topilmadi! Bu haqiqiy Android loyihasi ekanligiga ishonchingiz komilmi?"
+          exit 1
         fi
+        GRADLE_DIR=$(dirname "$GRADLEW_PATH")
+        echo "Loyiha papkasi topildi: $GRADLE_DIR"
+        chmod +x "$GRADLEW_PATH"
+        echo "PROJECT_DIR=$GRADLE_DIR" >> $GITHUB_ENV
 
     - name: APK faylni yig'ish (Build)
-      run: ./gradlew assembleDebug --no-daemon
+      run: |
+        cd ${{ env.PROJECT_DIR }}
+        ./gradlew assembleDebug --no-daemon
